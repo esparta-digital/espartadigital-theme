@@ -26,7 +26,7 @@ Description
 
 = Does this theme support any plugins? =
 
-Esparta digital includes support for WooCommerce and for Infinite Scroll in Jetpack.
+Esparta digital includes support for WooCommerce.
 
 == Changelog ==
 
