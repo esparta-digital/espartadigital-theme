@@ -28,9 +28,6 @@ function espartadigital_setup() {
 		*/
 	load_theme_textdomain( 'espartadigital', get_template_directory() . '/languages' );
 
-	// Add default posts and comments RSS feed links to head.
-	add_theme_support( 'automatic-feed-links' );
-
 	/*
 		* Let WordPress manage the document title.
 		* By adding theme support, we declare that this theme does not use a
@@ -189,6 +186,25 @@ remove_action('admin_print_styles', 'print_emoji_styles');
 remove_filter('the_content_feed', 'wp_staticize_emoji');
 remove_filter('comment_text_rss', 'wp_staticize_emoji');
 remove_filter('wp_mail', 'wp_staticize_emoji_for_email');
+
+// Cargar bootstrap internamente
+function espartadigital_enqueue_assets() {
+    wp_enqueue_style(
+        'bootstrap-css',
+        get_template_directory_uri() . '/css/bootstrap.min.css',
+        array(),
+        '5.3.7'
+    );
+
+    wp_enqueue_script(
+        'bootstrap-js',
+        get_template_directory_uri() . '/js/bootstrap.bundle.min.js',
+        array('jquery'), 
+        '5.3.7',
+        true
+    );
+}
+add_action('wp_enqueue_scripts', 'espartadigital_enqueue_assets');
 
 
 /**
