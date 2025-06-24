@@ -189,3 +189,94 @@ remove_action('admin_print_styles', 'print_emoji_styles');
 remove_filter('the_content_feed', 'wp_staticize_emoji');
 remove_filter('comment_text_rss', 'wp_staticize_emoji');
 remove_filter('wp_mail', 'wp_staticize_emoji_for_email');
+
+
+/**
+ * Panel de administración para insertar scripts en HEAD, BODY y FOOTER
+ */
+
+// Crear el menú en el admin
+function espartadigital_add_backend() {
+    add_menu_page(
+        'Inserción script',
+        'Inserción script',
+        'manage_options',
+        'esparta_script',
+        'front_esparta_script',
+        'dashicons-editor-code',
+        80
+    );
+}
+add_action('admin_menu', 'espartadigital_add_backend');
+
+// Mostrar formulario
+function front_esparta_script() {
+    if (!current_user_can('manage_options')) {
+        return;
+    }
+
+    // Guardar datos si se envía el formulario y nonce válido
+    if (
+        isset($_POST['esparta_script_nonce']) &&
+        wp_verify_nonce($_POST['esparta_script_nonce'], 'esparta_script_save')
+    ) {
+        if (isset($_POST["script_head_options"])) {
+            update_option('script_espartadigital_head', wp_unslash($_POST["script_head_options"]));
+        }
+        if (isset($_POST["script_body_options"])) {
+            update_option('script_espartadigital_body', wp_unslash($_POST["script_body_options"]));
+        }
+        if (isset($_POST["script_footer_options"])) {
+            update_option('script_espartadigital_footer', wp_unslash($_POST["script_footer_options"]));
+        }
+        echo '<div class="updated"><p>Scripts guardados correctamente.</p></div>';
+    }
+
+    // Formulario de inserción
+    ?>
+    <div class="wrap">
+        <h1>Inserción de Scripts</h1>
+        <form method="post" action="">
+            <?php wp_nonce_field('esparta_script_save', 'esparta_script_nonce'); ?>
+
+            <h3>HEAD</h3>
+            <textarea name="script_head_options" style="width: 100%; height: 200px;"><?php echo esc_textarea(get_option('script_espartadigital_head', '')); ?></textarea>
+
+            <h3>BODY</h3>
+            <textarea name="script_body_options" style="width: 100%; height: 200px;"><?php echo esc_textarea(get_option('script_espartadigital_body', '')); ?></textarea>
+
+            <h3>FOOTER</h3>
+            <textarea name="script_footer_options" style="width: 100%; height: 200px;"><?php echo esc_textarea(get_option('script_espartadigital_footer', '')); ?></textarea>
+
+            <p><input type="submit" class="button-primary" value="Guardar cambios"></p>
+        </form>
+    </div>
+    <?php
+}
+
+// Inyección en <head>
+function add_espartadigital_head() {
+    $script = get_option('script_espartadigital_head', '');
+    if (!empty($script)) {
+        echo "\n<!-- Script HEAD -->\n" . $script . "\n<!-- /Script HEAD -->\n";
+    }
+}
+add_action('wp_head', 'add_espartadigital_head');
+
+// Inyección en <body>
+function add_espartadigital_body() {
+    $script = get_option('script_espartadigital_body', '');
+    if (!empty($script)) {
+        echo "\n<!-- Script BODY -->\n" . $script . "\n<!-- /Script BODY -->\n";
+    }
+}
+add_action('wp_body_open', 'add_espartadigital_body');
+
+// Inyección en footer
+function add_espartadigital_footer() {
+    $script = get_option('script_espartadigital_footer', '');
+    if (!empty($script)) {
+        echo "\n<!-- Script FOOTER -->\n" . $script . "\n<!-- /Script FOOTER -->\n";
+    }
+}
+add_action('wp_footer', 'add_espartadigital_footer');
